@@ -25,8 +25,10 @@ int instflag = 0;
 int initflag = 0;
 int mainflag = 0;
 
+int pe = 1;
 int dispPath = 0;
 int dispTable = 0;
+
 
 struct node
 {	
@@ -36,6 +38,15 @@ struct node
 
 }nodes[5], lineNodes[2], sourceNode;
 
+
+void delay(int number_of_seconds)
+{
+    int milli_seconds = 1000 * number_of_seconds;
+ 
+    clock_t start_time = clock();
+ 
+    while (clock() < start_time + milli_seconds);
+}
 
 //write Distance between the nodes to screen
 void writeDistance(char *text, int x, int y)
@@ -105,6 +116,7 @@ void myInit()
 		dijkstraRun = 0;
 		sourceNodeCreated = 0;
 		destinationNodeCreated = 0;
+		pe = 0;
 }
 
 void init_display() 
@@ -114,56 +126,60 @@ void init_display()
 		 glLoadIdentity();
 		 
 			 if(instflag==1){
-				
-				
-				
+			
 				glBegin(GL_POLYGON);
 					glColor3f(0.0, 0.204, 0.204);
-					glVertex2f(0,wh-100);
-					glVertex2f(ww - 350,wh-100);
-					glVertex2f(ww - 350,0);
 					glVertex2f(0,0);
+					glVertex2f(ww - (ww/3.8),0);
+					glVertex2f(ww - (ww/3.8),wh-(wh/10.5));
+					glVertex2f(0,wh-(wh/10.5));
 				glEnd();
 				
 				glColor3f(1.0, 0.0, 0.0);
 				
-				writeDistance("INSTRUCTIONS", ww/2-270, 360);
-				writeDistance("______________", ww/2-270, 355);
+				writeDistance("INSTRUCTIONS", ww/3.5, wh-(wh/3.6));
+				writeDistance("______________", ww/3.5, wh-(wh/3.5));
 				
 				glColor3f(1.0, 1.0, 0.0);
-				writeDistance("USE MOUSE LEFT BUTTON TO CREATE NODES", ww/2-400, 290);
-				writeDistance("SELECT ANY TWO NODES TO CONNECT THEM", ww/2-400, 260);
-				writeDistance("USE MOUSE RIGHT BUTTON TO SELECT SOURCE NODE", ww/2-400, 230);
-				writeDistance("PRESS ENTER KEY TO START DIJKSTRA ALGORITHM", ww/2-400, 200);
+				writeDistance("USE MOUSE LEFT BUTTON TO CREATE NODES", ww/5.2, wh-(wh/2.9));
+				writeDistance("SELECT ANY TWO NODES TO CONNECT THEM", ww/5.2, wh-(wh/2.5));
+				writeDistance("USE MOUSE RIGHT BUTTON TO SELECT SOURCE NODE", ww/5.2, wh-(wh/2.2));
+				writeDistance("PRESS ENTER KEY TO START DIJKSTRA ALGORITHM", ww/5.2, wh-(wh/1.95));
 				
 				glColor3f(1.0, 0.0, 0.0);
-				writeDistance("OK", ww/2-200, 125);
+				
 
 				/*glBegin(GL_POLYGON);
 				
 					glColor3f(0.0, 0.0, 0.0);
-					glVertex2f((ww/3), 120);
-					glVertex2f((ww/2.6), 120);
-					glVertex2f((ww/2.6),150);
-					glVertex2f((ww/3), 150);
+					glVertex2f((ww/3.1), wh-(wh/1.55));
+					glVertex2f((ww/2.7), wh-(wh/1.55));
+					glVertex2f((ww/2.7),wh-(wh/1.7));
+					glVertex2f((ww/3.1), wh-(wh/1.7));
 
 				glEnd();*/
+
+				glColor3f(1.0, 1.0, 1.0);
+				writeDistance("OK", ww/3, wh-(wh/1.6));
+
 				dijkstraRun = 1;
 				//printf("%d",dijkstraRun);
 
 			}else if(dispTable == 1 || dispPath == 1){
 				if(dispPath==1){
-
+					
+				if(pe == 1){
 					dispPath = 0;
-					int aa=400,bb=560,i,t;
+					int aa=400,bb=wh-(wh/4.8),i,t;
 					glColor3f(1.0, 0.0, 0.0);
-					writeDistance("PATH", ww/2-400, 600);
+					writeDistance("PATH", ww/2-400,  wh-(wh/6.5));
+					writeDistance("_____", ww/2-400,  wh-(wh/6.3));
 
 					
 					for(i=0; i<nodeCount; i+=1){
-
-						if(visit[i] == 1 && i != sourceNode.id){
 						
+						if(visit[i] == 1 && i != sourceNode.id){
+							
 							sprintf(distanceString, "%d to %d : distance = %d path :",sourceNode.id,i,dist[i]);
 							writeDistance(distanceString, ww/2-400, bb);
 							
@@ -171,19 +187,19 @@ void init_display()
 							
 							t = prev[i];
 							sprintf(distanceString, "%d",i);
-							writeDistance(distanceString, ww/2-aa, bb);
+							writeDistance(distanceString, ww/2-aa,  bb);
 							
 							aa-=10;
 							
 							while(t != sourceNode.id){
 						      	        sprintf(distanceString, " <--  %d ",t);
-								writeDistance(distanceString, ww/2-aa, bb);
+								writeDistance(distanceString, ww/2-aa,  bb);
 								t = prev[t];
 								aa-=50;
 							}
 							
 							sprintf(distanceString, "  <--  %d ",sourceNode.id);
-							writeDistance(distanceString, ww/2-aa, bb);
+							writeDistance(distanceString, ww/2-aa,  bb);
 							
 							aa = 400;
 							bb-=30;
@@ -193,6 +209,7 @@ void init_display()
 				}else{
 
 				}
+			    }
 			}
 
 		glColor3f(1.0, 0.0, 1.0);
@@ -206,24 +223,24 @@ void init_display()
 
 			glBegin(GL_POLYGON);
 				glColor3f(1.0, 1.0, 1.0);
-				glVertex2f(ww-285, wh-235);
-				glVertex2f(ww-65, wh-235);
-				glVertex2f(ww-65, wh-280);
-				glVertex2f(ww-285, wh-280);
+				glVertex2f(ww - (ww/4.6), wh-(wh/3));
+				glVertex2f(ww-(ww/20.7), wh-(wh/3));
+				glVertex2f(ww-(ww/20.7), wh-(wh/2.55));
+				glVertex2f(ww - (ww/4.6), wh-(wh/2.55));
 			glEnd();
 
 
 			glBegin(GL_POLYGON);
 				glColor3f(1.0, 1.0, 1.0);
-				glVertex2f(ww-285, wh-295);
-				glVertex2f(ww-65, wh-295);
-				glVertex2f(ww-65, wh-340);
-				glVertex2f(ww-285, wh-340);
+				glVertex2f(ww - (ww/4.6), wh-(wh/2.4));
+				glVertex2f(ww-(ww/20.7), wh-(wh/2.4));
+				glVertex2f(ww-(ww/20.7),  wh-(wh/2.1));
+				glVertex2f(ww - (ww/4.6), wh-(wh/2.1));
 			glEnd();
 
 			glColor3f(1.0, 0.0, 1.0);
-			writeDistance("DISTANCE TABLE", ww-260, wh-265);
-			writeDistance("PATH FROM SOURCE", ww-270, wh-325);
+			writeDistance("DISTANCE TABLE", ww - (ww/5.1), wh-(wh/2.7));
+			writeDistance("PATH FROM SOURCE", ww - (ww/4.8), wh-(wh/2.2));
 		
 			//Borders
 
@@ -245,15 +262,7 @@ void init_display()
 
 
 
-			/*glBegin(GL_POLYGON);
-				glColor3f(1.0, 1.0, 1.0);
-				glVertex2f(ww-275, wh-650);
-				glVertex2f(ww-75, wh-650);
-				glVertex2f(ww-75, wh-690);
-				glVertex2f(ww-275, wh-690);
-			glEnd();
-s
-			
+			/*
 			glBegin(GL_POLYGON);
 				glColor3f(1.0, 1.0, 1.0);
 				glVertex2f(ww-(ww/4.82), wh-(wh/1.035));
@@ -446,11 +455,13 @@ void myMouse(int btn, int state, int x, int y)
 	y = wh-y;
 
 	if(btn==GLUT_LEFT_BUTTON && state==GLUT_DOWN && mainflag==1)
-	{	
+	{
 
-		if(dijkstraRun && (x < ww - 380)) 
+
+
+		if(dijkstraRun && (x < ww - (ww/3.8))) 
 		{
-			if((x > ww/3) && (x < ww/2.7) && (y<150) && (y>120)){
+			if((x > ww/3.1) && (x < ww/2.7) && (y< wh-(wh/1.7)) && (y>wh-(wh/1.55))){
 
 				instflag = 0;
 				dijkstraRun = 0;
@@ -459,24 +470,7 @@ void myMouse(int btn, int state, int x, int y)
 			}
 			return;
 		}
-/*
-		glBegin(GL_POLYGON);
-				glColor3f(1.0, 1.0, 1.0);
-				glVertex2f(ww-(ww/4.82), wh-(wh/1.138));
-				glVertex2f(ww-(ww/7.3), wh-(wh/1.138));
-				glVertex2f(ww-(ww/7.3), wh-(wh/1.138)+30.9);
-				glVertex2f(ww-(ww/4.82), wh-(wh/1.138)+30.9);
-			glEnd();
 
-			glBegin(GL_POLYGON);
-				glColor3f(1.0, 1.0, 1.0);
-				glVertex2f(ww-(ww/7.8), wh-(wh/1.138));
-				glVertex2f(ww-(ww/15.5), wh-(wh/1.138));
-				glVertex2f(ww-(ww/15.5), wh-(wh/1.138)+30.9);
-				glVertex2f(ww-(ww/7.8), wh-(wh/1.138)+30.9);
-			glEnd();
-
-*/
 		if((x > ww-(ww/4.82)) && (x < ww-(ww/7.3)) && (y<wh-(wh/1.138)+30.9) && (y>wh-(wh/1.138))){
 			printf("CLEARING\n");
 			myInit();
@@ -496,7 +490,13 @@ void myMouse(int btn, int state, int x, int y)
 			init_display();
 
 
-		}else if((x > ww-(ww/4.82) ) && (x < ww-65) && (y<wh-295) && (y>wh-340)){
+				glVertex2f(ww - (ww/4.6), wh-(wh/2.4));
+				glVertex2f(ww-(ww/20.7), wh-(wh/2.4));
+				glVertex2f(ww-(ww/20.7),  wh-(wh/2.1));
+				glVertex2f(ww - (ww/4.6), wh-(wh/2.1));
+
+
+		}else if((x > ww - (ww/4.6) ) && (x < ww-(ww/20.7)) && (y<wh-(wh/2.4)) && (y>wh-(wh/2.1))){
 			
 			dispPath=1;
 			//myInit();
@@ -505,7 +505,9 @@ void myMouse(int btn, int state, int x, int y)
 
 		}
 
-		else if(!(x < ww - 380) || !(y < wh-130) ){
+
+
+		else if(!(x < ww - (ww/3.5)) || !(y < wh-(wh/6.8)) ){
 			return;
 		}
 
@@ -624,6 +626,7 @@ void beginDijkstra(unsigned char key, int x, int y)
 	if((int)key == 13)
 	{	
 		dijkstraRun = 1;
+		pe = 1;
 		dijkstra();
 	}
 }
@@ -645,16 +648,6 @@ int minimun(int *dist, int *visit)
 	}
 	return u;
 }
-
-void delay(int number_of_seconds)
-{
-    int milli_seconds = 1000 * number_of_seconds;
- 
-    clock_t start_time = clock();
- 
-    while (clock() < start_time + milli_seconds);
-}
-
 
 //Dijkstra's algorithm
 void dijkstra()
@@ -774,4 +767,3 @@ int main(int argc, char **argv)
 
 
 */
-
